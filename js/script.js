@@ -1,7 +1,7 @@
 var canvas, context;
 var canon = new Image();
 var bg = new Image();
-var bricks = new Array(40);
+var bricks = new Array(45);
 var balls = new Array(10);
 
 var cx=360;
@@ -16,9 +16,10 @@ var brickImg = function(){
 var myBrick = function(x,y){
   this.x=x;
   this.y=y;
-  
+  this.spawn=true;
   this.draw=function(){
-    document.getElementById("canvas").getContext("2d").drawImage(this.image,this.x,this.y,70,70);
+    if(this.spawn)
+    document.getElementById("canvas").getContext("2d").drawImage(this.image,this.x,this.y,60,60);
   }
   
 }
@@ -58,10 +59,10 @@ function setup(){
   for(var i=0; i<10;i++){
     balls[i] = new ball(cx+32);
   } 
-  for(var i = 0; i < 40; i++) {
+  for(var i = 0; i < 45; i++) {
     
-    var x = (i%10) * 80;
-    var y = parseInt(i/10) * 80;
+    var x = (i%9) * 90 + 7;
+    var y = parseInt(i/9) * 80;
     bricks[i] = new myBrick(x,y);
     
   }
@@ -98,7 +99,7 @@ function showImg() {
   context.clearRect(0,0,canvas.width,canvas.height);
   
 //   fill bg
-  context.drawImage(bg,0,0);
+  context.drawImage(bg,0,0,canvas.width,canvas.height);
   
   // 畫圖
   context.drawImage(canon,cx,cy);
@@ -107,11 +108,24 @@ function showImg() {
   if(dct==0 && cx>0){cx-=4;}
   if(dct==1 && cx+4+80<800){cx+=4;}  
   
-  for(var i=0; i<40;i++){
+  for(var i=0; i<45;i++){
     bricks[i].draw();
   }
+  
   for(var i=0; i<10;i++){
-    if(balls[i].spawn){
+    if(balls[i].spawn){      
+      var bax = balls[i].x;
+      var bay = balls[i].y;
+      for(var j = 0; j<45; j++){
+        if(bricks[j].spawn==false) continue;
+        var brx=bricks[j].x;
+        var bry=bricks[j].y;
+        
+        if(bax>=brx && bax<=brx+50 && bay>=bry && bay<=bry+50){
+          bricks[j].spawn=false;
+          balls[i].spawn=false;
+        }
+      }
       if(balls[i].y+30>0){balls[i].y-=10;}
       else {
         balls[i].spawn=false;
